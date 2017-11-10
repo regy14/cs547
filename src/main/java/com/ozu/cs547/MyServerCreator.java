@@ -1,22 +1,32 @@
 package com.ozu.cs547;
 
+import java.io.IOException;
+import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
-import java.io.IOException;
-
 @ShellComponent
 public class MyServerCreator {
 
-    @Autowired
-    MyServer myserver;
+  @Autowired
+  MyServer myserver;
 
-    @ShellMethod("Creates server")
-    public String createserver(@ShellOption String serverPort) throws IOException {
-        myserver.createMyServer(Integer.parseInt(serverPort));
-        return "Server created. Listening for connection on port " + serverPort + " ....";
+  @PostConstruct
+  public void startLogger() {
+    try {
+      myserver.printLogs();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
+  }
+
+  @ShellMethod("Creates server")
+  public String createserver(@ShellOption String serverPort, @ShellOption String path)
+      throws IOException {
+    myserver.createMyServer(Integer.parseInt(serverPort), path);
+    return "Server created. Listening for connection on port " + serverPort + " ....";
+  }
 
 }
